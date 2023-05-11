@@ -104,10 +104,10 @@
             <button onclick="fillBoard(paintEmoji)">Fill</button>
             <div class="recent-emoji flex pointer">
                 <div onclick="chooseEmoji(this)">❤️</div>
-                <div onclick="chooseEmoji(this)">🖤</div>
+                <div onclick="chooseEmoji(this)">🐍</div>
                 <div onclick="chooseEmoji(this)">🤍</div>
                 <div class="selected" onclick="chooseEmoji(this)">🍺</div>
-                <div onclick="chooseEmoji(this)">⚫</div>
+                <div onclick="chooseEmoji(this)">🖤</div>
             </div>
             <div class="add-more" oninput="emojiInput(event)" editable>➕</div>
             <button onclick="copyArt()">Copy</button>
@@ -159,7 +159,7 @@
             emojiSize: 24,
         };
 
-        let fillEmoji = '⚫'
+        let fillEmoji = '🖤'
         let paintEmoji;
         // let boardWidth =  conf.boardCols*conf.emojiSize;
         // let boardHeight =  conf.boardWidth*conf.emojiSize;
@@ -225,7 +225,7 @@
         }
 
         function copyArt(){
-            let emojis = Array.from(boardDiv.children).map(({textContent})=>textContent?textContent:'\u{3164}')
+            let emojis = Array.from(boardDiv.children).map(({textContent})=>textContent)
             copy(emojis.join(''))
             // for({textContent} of boardDiv.children()){}            
         }

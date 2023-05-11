@@ -22,7 +22,7 @@ function copySafari(string){
     input.setAttribute('value', string);
     input.style.opacity = '0';
     input.style.position = 'absolute';
-    input.style.left = '-9999px';
+    // input.style.left = '-9999px';
     document.body.appendChild(input);
     input.select();
     document.execCommand('copy');
