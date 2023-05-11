@@ -1,0 +1,17 @@
+basic server to serve all apps
+send console logs to server
+
+on touch or mouse click
+get click coords
+create absolute div class="circle", add to html
+set div coords recpectively,
+set random background-color
+maybe +1 z index
+also default div styles
+width
+height
+border radius
+transition time
+animation keyframes
+
+if third element created remove first

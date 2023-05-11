@@ -1,0 +1,9 @@
+.flex{
+    display: flex;
+}
+.w-100{
+    width: 100%;
+}
+.pointer{
+    cursor: pointer;
+}

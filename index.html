@@ -1,0 +1,236 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no" >
+    <title>Mojart</title>
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
+    <!-- <link rel="shortcut icon" href="#"> -->
+    <link rel="stylesheet" href="./mywind.css">
+    <script src="./utils.js"></script>
+    <script src="./mouseDown.js" defer></script>
+</head>
+<style>
+    body{
+        scroll-behavior: none;
+    }
+    .main{
+        display: flex;
+        justify-content: center;
+        background-color: rgb(26, 1, 19);
+    }
+    /* * {
+        touch-action: manipulation;
+    } */
+    .art-board{
+        cursor: pointer;
+        user-select: none;
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        border: 2px solid rgb(255, 0, 64);
+        padding: 5px;
+        border-radius: 12px;
+    }
+    .cell{
+        width: 30px;
+        height: 30px;
+    }
+    .art-menu{
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+    .add-more{
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        border: none;
+        caret-color: transparent;
+        text-align: center;
+    
+    }
+    .side-menu{
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .board-wrapper{
+        display: flex;
+        gap: 10px
+    }
+    .top-menu{
+        display: flex;
+        color: white;
+        font-size: 1.2em;
+        font-weight: bold;
+        gap: 5px;
+    }
+    .container{
+        display: flex;
+        flex-direction: column;
+        gap: 10px
+    }
+    .recent-emoji{
+        display: flex;
+        gap: 5px;
+    }
+    .recent-emoji > div {
+        padding: 2px;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .selected{
+        border-radius: 50%;
+        background-color: rgba(255,255,255,0.5);
+    }
+</style>
+<body class="main">
+    <div class="container">
+        <div class="top-menu">
+            <button onclick="resizeBoard('w-')">◀</button>
+            <button onclick="resizeBoard('w+')">▶</button>
+            <button onclick="resizeBoard('h-')">🔼</button>
+            <button onclick="resizeBoard('h+')">🔽</button>
+            <div class="width"></div>
+        </div>
+
+        <div class="art-board" id="touch-area"></div>
+
+        <div class="art-menu">
+            <button onclick="fillBoard(paintEmoji)">Fill</button>
+            <div class="recent-emoji flex pointer">
+                <div onclick="chooseEmoji(this)">❤️</div>
+                <div onclick="chooseEmoji(this)">🖤</div>
+                <div onclick="chooseEmoji(this)">🤍</div>
+                <div class="selected" onclick="chooseEmoji(this)">🍺</div>
+                <div onclick="chooseEmoji(this)">⚫</div>
+            </div>
+            <div class="add-more" oninput="emojiInput(event)" editable>➕</div>
+            <button onclick="copyArt()">Copy</button>
+        </div>
+        
+    </div>
+    
+    <script>
+        document.querySelectorAll('[editable]').forEach((element)=>{
+            element.contentEditable = true;
+            element.spellcheck= false;
+        })
+
+
+        function emojiInput(event){
+            event.target.innerText='➕';
+            recentEmojiDiv.insertAdjacentHTML('beforeend', `
+                <div onclick="chooseEmoji(this)">${event.data}</div>
+            `);
+            recentEmojiDiv.children[0].remove()
+        }
+
+        function resizeBoard(option){
+            switch(option){
+                case 'w+': 
+                    conf.boardCols++;
+                    break;
+                case 'w-':
+                    conf.boardCols--
+                    break;
+                case 'h+': 
+                    conf.boardRows++;
+                    break;
+                case 'h-':
+                    conf.boardRows--
+                    break;
+            }
+            fillBoard(fillEmoji, 'update')
+            setupBoard();
+        }
+        //elements
+        let boardDiv = query('.art-board')
+        let widthDiv = query('.width')
+        
+        //configs
+        let conf = {
+            boardCols: 12,
+            boardRows: 12,
+            emojiSize: 24,
+        };
+
+        let fillEmoji = '⚫'
+        let paintEmoji;
+        // let boardWidth =  conf.boardCols*conf.emojiSize;
+        // let boardHeight =  conf.boardWidth*conf.emojiSize;
+        function totalEmojis(){
+            return conf.boardCols * conf.boardRows;
+        }
+
+        let recentEmojiDiv = document.querySelector('.recent-emoji')
+        
+        function fillBoard(emoji, type='new'){
+            let currentState = boardDiv.children;
+            if(type=='new'){
+                currentState = [];
+            }
+            let fillDivs = times(totalEmojis()).map((element, index)=>{
+                return `
+                    <div class="cell">${currentState[index] ? currentState[index].innerText : emoji}</div>
+                `
+            }).join('');
+            boardDiv.innerHTML = '';
+            boardDiv.insertAdjacentHTML('afterbegin', fillDivs)
+        }
+        fillBoard(fillEmoji);
+
+        // initialisation
+        function setupBoard(){
+            boardDiv.style.gridTemplateColumns = `repeat(${conf.boardCols}, 1fr)`;
+            boardDiv.style.gridTemplateRows = `repeat(${conf.boardRows}, 1fr)`;
+            boardDiv.style.fontSize = conf.emojiSize + 'px'; 
+            widthDiv.innerText = 'width count: '+conf.boardCols;
+
+            for(elem of recentEmojiDiv.children){
+                if(elem.className.includes('selected')){
+                    paintEmoji = elem.innerText
+                }
+            }
+        }
+
+        setupBoard()
+
+        function chooseEmoji(element){
+            paintEmoji = element.innerText;
+            for(elem of element.parentElement.children){
+                elem.classList.remove('selected')
+            }
+            element.classList.add('selected')
+        }
+
+        function paint(event, isTouch = false){
+            let touch,targetCell;
+
+            if(isTouch){
+                touch = event.touches[0];
+                targetCell = document.elementFromPoint(touch.clientX, touch.clientY);
+            }else{
+                targetCell = event.target;
+            }
+            if(targetCell){
+                if(targetCell.className.includes('cell')){
+                    targetCell.textContent = paintEmoji;
+                }
+            }
+        }
+
+        function copyArt(){
+            let emojis = Array.from(boardDiv.children).map(({textContent})=>textContent?textContent:'\u{3164}')
+            copy(emojis.join(''))
+            // for({textContent} of boardDiv.children()){}            
+        }
+
+
+    </script>
+</body>
+</html>
